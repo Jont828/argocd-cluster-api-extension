@@ -11,10 +11,10 @@ const stylesHandler = "style-loader";
 const extName = "Cluster-API";
 
 const config = {
-  entry: "./src/index.js",
+  entry: "./src/index.jsx",
   output: {
     filename: 'extensions.js',
-    path: __dirname + `/dist/resources/${extName}/ui`,
+    path: __dirname + `/dist/resources/${extName}/web`,
     libraryTarget: 'window',
     library: ['extensions', 'resources'],
   },
