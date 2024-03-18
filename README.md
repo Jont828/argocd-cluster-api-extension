@@ -1,0 +1,1 @@
+# argocd-cluster-api-extension
