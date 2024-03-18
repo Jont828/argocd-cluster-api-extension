@@ -9,18 +9,13 @@ export const Extension = (props) => {
   )
 }
 
+export const component = Extension;
+
 ((window) => {
-  const component = () => {
-    return React.createElement(
-      "div",
-      { style: { padding: "10px" } },
-      "Hello World"
-    );
-  };
-  window.extensionsAPI.registerSystemLevelExtension(
+  window.extensionsAPI.registerResourceExtension(
     component,
-    "Test Ext",
-    "/hello",
-    "fa-flask"
+    "*",
+    "*",
+    "Nice extension"
   );
 })(window);
