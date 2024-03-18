@@ -14,8 +14,8 @@ export const component = Extension;
 ((window) => {
   window.extensionsAPI.registerResourceExtension(
     component,
-    "*",
-    "*",
-    "Nice extension"
+    "argoproj.io",
+    "Application",
+    "My Application Tab"
   );
 })(window);
