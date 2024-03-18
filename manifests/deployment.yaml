@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-cluster-api-extension
+spec:
+  selector:
+    matchLabels:
+      app: argocd-cluster-api-extension
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: argocd-cluster-api-extension
+    spec:
+      containers:
+        - image: quay.io/argoprojlabs/argocd-extension-metrics:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - '-enableTLS=false'
+          name: argocd-cluster-api-extension
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
