@@ -1,17 +1,26 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import * as React from "react";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+export const Extension = (props) => {
+  return (
+    <div>
+      <h1>Hello world!</h1>
+      <p>Find me in ./web/src/index.js</p>
+    </div>
+  )
+}
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+((window) => {
+  const component = () => {
+    return React.createElement(
+      "div",
+      { style: { padding: "10px" } },
+      "Hello World"
+    );
+  };
+  window.extensionsAPI.registerSystemLevelExtension(
+    component,
+    "Test Ext",
+    "/hello",
+    "fa-flask"
+  );
+})(window);
