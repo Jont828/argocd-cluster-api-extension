@@ -1,25 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: argocd-cluster-api-extension
+  name: capiargo-argocd-server
 spec:
-  selector:
-    matchLabels:
-      app: argocd-cluster-api-extension
-  strategy:
-    type: Recreate
   template:
-    metadata:
-      labels:
-        app: argocd-cluster-api-extension
     spec:
+      initContainers:
+        - name: extension-metrics
+          image: quay.io/argoprojlabs/argocd-extension-installer:v0.0.1
+          env:
+          - name: EXTENSION_URL
+            value: https://github.com/Jont828/argocd-cluster-api-extension/raw/main/web/extension.tar
+          volumeMounts:
+            - name: extensions
+              mountPath: /tmp/extensions/
+          securityContext:
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
       containers:
-        - image: quay.io/argoprojlabs/argocd-extension-metrics:latest
-          imagePullPolicy: IfNotPresent
-          args:
-            - '-enableTLS=false'
-          name: argocd-cluster-api-extension
-          resources:
-            requests:
-              cpu: 100m
-              memory: 100Mi
+        - name: server
+          volumeMounts:
+            - name: extensions
+              mountPath: /tmp/extensions/
+      volumes:
+        - name: extensions
+          emptyDir: {}
