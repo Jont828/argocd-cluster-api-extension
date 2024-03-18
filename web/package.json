@@ -12,10 +12,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "webpack --config ./webpack.config.js --watch",
+    "build": "webpack --config ./webpack.config.js && tar -C dist -cvf extension.tar resources"
   },
   "eslintConfig": {
     "extends": [
@@ -34,5 +32,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "webpack": "^5.90.3",
+    "webpack-cli": "^5.1.4"
   }
 }
