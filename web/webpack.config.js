@@ -25,6 +25,7 @@ const config = {
   externals: {
     react: "React",
   },
+  plugins: [new HtmlWebpackPlugin()],
   module: {
     rules: [
       {
