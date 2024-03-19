@@ -18,6 +18,6 @@ export const component = Extension;
     component,
     "Cluster API",
     "/cluster-api",
-    "fa-turtle"
+    "fa-cloud"
   );
 })(window);
