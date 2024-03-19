@@ -42,7 +42,7 @@ const orgChart = {
 export default function OrgChartTree() {
   return (
     // `<Tree />` will fill width/height of its container; in this case `#treeWrapper`.
-    <div id="treeWrapper" style={{ width: '50em', height: '20em' }}>
+    <div id="treeWrapper" style={{ width: '100%', height: '100%' }}>
       <Tree data={orgChart} />
     </div>
   );
