@@ -3,7 +3,7 @@ import Tree from "./components/Tree.jsx";
 
 export const Extension = (props) => {
   return (
-    <div>
+    <div id="root">
       <h1>Hello world!</h1>
       <p>Find me in ./web/src/index.js</p>
       <Tree />
@@ -14,10 +14,10 @@ export const Extension = (props) => {
 export const component = Extension;
 
 ((window) => {
-  window.extensionsAPI.registerResourceExtension(
+  window.extensionsAPI.registerSystemLevelExtension(
     component,
-    "argoproj.io",
-    "Application",
-    "My Application Tab"
+    "Cluster API",
+    "/cluster-api",
+    "fa-turtle"
   );
 })(window);
