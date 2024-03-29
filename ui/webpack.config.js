@@ -14,7 +14,7 @@ const config = {
   entry: "./src/index.jsx",
   output: {
     filename: 'extensions.js',
-    path: __dirname + `/dist/resources/${extName}/web`,
+    path: __dirname + `/dist/resources/${extName}/ui`,
     libraryTarget: 'window',
     library: ['extensions', 'resources'],
   },
