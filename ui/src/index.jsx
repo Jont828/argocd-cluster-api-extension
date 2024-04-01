@@ -5,9 +5,12 @@ import { default as axios } from 'axios';
 export const Extension = (props) => {
   const [apps, setApps] = React.useState(null);
 
-  React.useEffect(async () => {
-    let result = await getApplications();
-    setApps(result.items);
+  React.useEffect(() => {
+    async function fetchData() {
+      let result = await getApplications();
+      setApps(result.items);
+    }
+    fetchData();
   }, []);
 
   if (!apps) {
@@ -69,8 +72,10 @@ const getApplications = () => {
   // };
 
   return axios.get(`/api/v1/applications`).then(response => {
-    const { manifest } = response.data;
-    return JSON.parse(manifest);
+    const result = response.data;
+    console.log("Result is");
+    console.log(result);
+    return result;
   }).catch(err => {
     console.log(err);
     return err;
