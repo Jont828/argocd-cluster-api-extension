@@ -1,9 +1,11 @@
 import * as React from "react";
 import Tree from "./components/Tree.jsx";
 import { default as axios } from 'axios';
+import ClusterView from "./components/ClusterView.jsx";
 
 export const Extension = (props) => {
   const [apps, setApps] = React.useState(null);
+  const [selected, setSelected] = React.useState("");
 
   React.useEffect(() => {
     async function fetchData() {
@@ -23,10 +25,13 @@ export const Extension = (props) => {
       <ul>
         {apps.map(app => (
           <li key={app.metadata.name}>
-            <h2>{app.metadata.name}</h2>
+            <button onClick={() => {setSelected(app.metadata.name)}}>{app.metadata.name}</button>
           </li>
         ))}
       </ul>
+      {
+        selected && <ClusterView name={selected} />
+      }
     </div>
   )
 }
