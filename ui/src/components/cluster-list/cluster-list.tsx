@@ -2,7 +2,7 @@ import * as React from "react";
 // import Tree from "./components/Tree";
 import { Flex, Card } from "antd";
 
-export default function WorkloadClusters(props: any) {
+export default function ClusterList(props: any) {
   if (props.clusterApps.length === 0) {
     return <div>No clusters found</div>;
   }
@@ -22,7 +22,7 @@ export default function WorkloadClusters(props: any) {
   }
 
   return (
-    <div id="root">
+    <div id="cluster-list-wrap">
       <Flex gap="small" align="flex-start" justify="flex-start" wrap="wrap">
         {props.clusterApps.map(clusterApp => {
           const { cluster, app } = clusterApp;
