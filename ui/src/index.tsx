@@ -8,7 +8,7 @@ import WorkloadClusterList from "./components/WorkloadClusterList";
 export const Extension = (props: any) => {
   // const [apps, setApps] = React.useState(null);
   const [clusterApps, setClusterApps] = React.useState([]); // [cluster1, cluster2, ...
-  const [selected, setSelected] = React.useState("");
+  const [selected, setSelected] = React.useState(null);
 
   React.useEffect(() => {
     async function fetchData() {
@@ -26,7 +26,7 @@ export const Extension = (props: any) => {
     <div id="root">
       <WorkloadClusterList clusterApps={clusterApps} handleSelect={(name: string) => setSelected(name)} />
       {
-        selected && <ClusterView name={selected} />
+        selected && <ClusterView name={selected.cluster.name} />
       }
     </div>
   )
