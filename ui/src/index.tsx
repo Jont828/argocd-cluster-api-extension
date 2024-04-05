@@ -1,9 +1,9 @@
 import * as React from "react";
-import Tree from "./components/Tree.jsx";
+// import Tree from "./components/Tree";
 import { default as axios } from 'axios';
-import ClusterView from "./components/ClusterView.jsx";
+import ClusterView from "./components/ClusterView";
 
-export const Extension = (props) => {
+export const Extension = (props: any) => {
   const [apps, setApps] = React.useState(null);
   const [selected, setSelected] = React.useState("");
 
@@ -38,7 +38,7 @@ export const Extension = (props) => {
 
 export const component = Extension;
 
-((window) => {
+((window: any) => {
   window.extensionsAPI.registerSystemLevelExtension(
     component,
     "Cluster API",
@@ -47,7 +47,8 @@ export const component = Extension;
   );
 })(window);
 
-const getResource = (name, appNamespace, resource) => {
+// @ts-ignore
+const getResource = (name: string | undefined, appNamespace : string | undefined, resource: any): Promise<any> => {
   const params = {
     name,
     appNamespace,
@@ -64,7 +65,7 @@ const getResource = (name, appNamespace, resource) => {
   });
 };
 
-const getApplications = () => {
+const getApplications = (): Promise<any> => {
   // const params = {
   //   name: name,
   //   refresh: refresh,

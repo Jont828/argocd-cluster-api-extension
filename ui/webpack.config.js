@@ -11,7 +11,7 @@ const stylesHandler = "style-loader";
 const extName = "Cluster-API";
 
 const config = {
-  entry: "./src/index.jsx",
+  entry: "./src/index.tsx",
   output: {
     filename: 'extensions.js',
     path: __dirname + `/dist/resources/${extName}/ui`,
@@ -26,8 +26,19 @@ const config = {
     react: "React",
   },
   plugins: [new HtmlWebpackPlugin()],
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
+  },
   module: {
     rules: [
+      {
+        test: /\.tsx?$/,
+        loader: 'ts-loader',
+        options: {
+          allowTsInNodeModules: true,
+          configFile: path.resolve('./src/tsconfig.json')
+        },
+      },
       {
         test: /\.(js|jsx)$/i,
         loader: "babel-loader",
