@@ -7,24 +7,24 @@ import WorkloadClusterList from "./components/WorkloadClusterList";
 
 export const Extension = (props: any) => {
   // const [apps, setApps] = React.useState(null);
-  const [clusters, setClusters] = React.useState([]); // [cluster1, cluster2, ...
+  const [clusterApps, setClusterApps] = React.useState([]); // [cluster1, cluster2, ...
   const [selected, setSelected] = React.useState("");
 
   React.useEffect(() => {
     async function fetchData() {
-      let result = await getClusters();
-      setClusters(result);
+      let result = await getClusterApps();
+      setClusterApps(result);
     }
     fetchData();
   }, []);
 
-  if (clusters.length === 0) {
+  if (clusterApps.length === 0) {
     return <div>Loading...</div>;
   }
 
   return (
     <div id="root">
-      <WorkloadClusterList clusters={clusters} handleSelect={(name: string) => setSelected(name)} />
+      <WorkloadClusterList clusterApps={clusterApps} handleSelect={(name: string) => setSelected(name)} />
       {
         selected && <ClusterView name={selected} />
       }
@@ -61,21 +61,29 @@ const getResource = (appName: string, appNamespace : string | undefined, resourc
   });
 };
 
-async function getClusters(): Promise<any> {
+interface ClusterApp {
+  cluster: any;
+  app: any;
+}
+
+async function getClusterApps(): Promise<ClusterApp[]> {
   let result = await getApplications();
   const apps = result.items;
-  let clusters = [];
+  let clusterApps = [];
   for (const app of apps) {
     let resources = app.status.resources;
     const found = resources.find((resource: any) => resource.kind === "Cluster" && resource.group === "cluster.x-k8s.io");
     if (found) {
       let result = await getResource(app.metadata.name, app.metadata.namespace, found);
       console.log("Result is", result);
-      clusters.push(result);
+      clusterApps.push({
+        cluster: result,
+        app: app // Make sure this isn't an implicit loop variable issue.
+      });
     }
   };
 
-  return clusters;
+  return clusterApps;
 }
 
 const getApplications = (): Promise<any> => {
