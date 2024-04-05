@@ -1,6 +1,9 @@
 import * as React from "react";
 // import Tree from "./components/Tree";
 import { default as axios } from 'axios';
+
+import { Button } from "antd";
+
 import ClusterView from "./components/ClusterView";
 
 export const Extension = (props: any) => {
@@ -25,7 +28,7 @@ export const Extension = (props: any) => {
       <ul>
         {apps.map(app => (
           <li key={app.metadata.name}>
-            <button onClick={() => {setSelected(app.metadata.name)}}>{app.metadata.name}</button>
+            <Button type="primary" onClick={() => {setSelected(app.metadata.name)}}>{app.metadata.name}</Button>
           </li>
         ))}
       </ul>
