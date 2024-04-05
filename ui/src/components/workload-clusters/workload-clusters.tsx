@@ -2,7 +2,7 @@ import * as React from "react";
 // import Tree from "./components/Tree";
 import { Flex, Card } from "antd";
 
-export default function WorkloadClusterList(props: any) {
+export default function WorkloadClusters(props: any) {
   if (props.clusterApps.length === 0) {
     return <div>No clusters found</div>;
   }

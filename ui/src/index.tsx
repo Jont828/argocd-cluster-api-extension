@@ -2,8 +2,8 @@ import * as React from "react";
 // import Tree from "./components/Tree";
 import { default as axios } from 'axios';
 
-import ClusterView from "./components/ClusterView";
-import WorkloadClusterList from "./components/WorkloadClusterList";
+import ClusterResources from "./components/cluster-resources/cluster-resources";
+import WorkloadClusters from "./components/workload-clusters/workload-clusters";
 
 export const Extension = (props: any) => {
   // const [apps, setApps] = React.useState(null);
@@ -24,9 +24,9 @@ export const Extension = (props: any) => {
 
   return (
     <div id="root">
-      <WorkloadClusterList clusterApps={clusterApps} handleSelect={(name: string) => setSelected(name)} />
+      <WorkloadClusters clusterApps={clusterApps} handleSelect={(name: string) => setSelected(name)} />
       {
-        selected && <ClusterView name={selected.cluster.name} />
+        selected && <ClusterResources name={selected.cluster.name} />
       }
     </div>
   )

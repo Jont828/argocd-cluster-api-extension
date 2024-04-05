@@ -1,6 +1,6 @@
 import * as React from "react";
 
-export default function ClusterView(props) {
+export default function ClusterResources(props) {
   return (
     <div>
       <h1>Cluster Resources: {props.name}</h1>
