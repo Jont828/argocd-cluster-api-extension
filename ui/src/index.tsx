@@ -24,9 +24,9 @@ export const Extension = (props: any) => {
 
   return (
     <div id="root">
-      <ClusterList clusterApps={clusterApps} handleSelect={(name: string) => setSelected(name)} />
+      <ClusterList clusterApps={clusterApps} handleSelect={(clusterApp: ClusterApp) => setSelected(clusterApp)} />
       {
-        selected && <ClusterResources name={selected.cluster.name} />
+        selected && <ClusterResources app={selected.app} cluster={selected.cluster} />
       }
     </div>
   )
@@ -76,7 +76,7 @@ async function getClusterApps(): Promise<ClusterApp[]> {
       const found = resources.find((resource: any) => resource.kind === "Cluster" && resource.group === "cluster.x-k8s.io");
       if (found) {
         let result = await getResource(app.metadata.name, app.metadata.namespace, found);
-        console.log("Result is", result);
+        console.log("getResource() result is", result);
         clusterApps.push({
           cluster: result,
           app: app // Make sure this isn't an implicit loop variable issue.
@@ -91,7 +91,7 @@ async function getClusterApps(): Promise<ClusterApp[]> {
 const getApplications = (): Promise<any> => {
   return axios.get(`/api/v1/applications`).then(response => {
     const result = response.data;
-    console.log("Result is");
+    console.log("getApplications() result is");
     console.log(result);
     return result;
   }).catch(err => {

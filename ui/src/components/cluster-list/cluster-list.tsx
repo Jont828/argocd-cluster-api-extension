@@ -13,6 +13,7 @@ export default function ClusterList(props: any) {
   for (let i = 0; i < 10; i++) {
     cards.push(<Card
       title={"Cluster " + i}
+      key={i}
       style={{ width: 300 }}
       hoverable
     >
