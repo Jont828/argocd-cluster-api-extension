@@ -19,7 +19,7 @@ export const Extension = (props: any) => {
   }, []);
 
   if (clusterApps.length === 0) {
-    return <div>Loading...</div>;
+    return <div>No Clusters found</div>;
   }
 
   return (
@@ -71,15 +71,17 @@ async function getClusterApps(): Promise<ClusterApp[]> {
   const apps = result.items;
   let clusterApps = [];
   for (const app of apps) {
-    let resources = app.status.resources;
-    const found = resources.find((resource: any) => resource.kind === "Cluster" && resource.group === "cluster.x-k8s.io");
-    if (found) {
-      let result = await getResource(app.metadata.name, app.metadata.namespace, found);
-      console.log("Result is", result);
-      clusterApps.push({
-        cluster: result,
-        app: app // Make sure this isn't an implicit loop variable issue.
-      });
+    if ("resources" in app.status) {
+      let resources = app.status.resources;
+      const found = resources.find((resource: any) => resource.kind === "Cluster" && resource.group === "cluster.x-k8s.io");
+      if (found) {
+        let result = await getResource(app.metadata.name, app.metadata.namespace, found);
+        console.log("Result is", result);
+        clusterApps.push({
+          cluster: result,
+          app: app // Make sure this isn't an implicit loop variable issue.
+        });
+      }
     }
   };
 

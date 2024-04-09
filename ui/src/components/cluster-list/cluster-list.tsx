@@ -25,7 +25,7 @@ export default function ClusterList(props: any) {
 
   return (
     <div id="cluster-list-wrap">
-      <Flex gap="small" align="flex-start" justify="flex-start" wrap="wrap">
+      <Flex gap="middle" align="flex-start" justify="flex-start" wrap="wrap">
         {props.clusterApps.map(clusterApp => {
           const { cluster, app } = clusterApp;
           const readyCondition = cluster.status.conditions.find((condition: any) => condition.type === "Ready");
