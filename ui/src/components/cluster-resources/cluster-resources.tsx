@@ -64,30 +64,39 @@ interface ArgoParentRef {
   version: string
 }
 
+// TODO: should this be a Map<string, Set<string>>?
+interface OwnershipMap {
+  [key: string]: Set<string>
+}
+
 function convertNodeListToD3ResourceTree(nodes: ArgoNode[]): any {
-  let nodeToChildren = {};
+  let ownership : OwnershipMap = {}; // Map of parent UID to set of children UIDs.
+  let uidToNode = {}; // Map of UID to node.
   for (let node of nodes) {
+    if (!(node.uid in uidToNode)) {
+      uidToNode[node.uid] = node;
+    }
+
     if ("parentRefs" in node) {
       // TODO: figure out transitive owners later on.
       if (node.parentRefs.length > 1) {
         console.error("Node has more than one parentRefs", node);
       }
       const parentUID = node.parentRefs[0].uid;
-      if (!(parentUID in nodeToChildren)) {
-        nodeToChildren[parentUID] = [];
+      if (!(parentUID in ownership)) {
+        ownership[parentUID] =  new Set<string>();
       }
-      nodeToChildren[parentUID].push(node);
+      ownership[parentUID].add(node.uid);
     } else {
       console.log("Found root", node);
-      nodeToChildren[node.uid] = [];
+      ownership[node.uid] = new Set<string>();
     }
   }
 
-
-  for(const uid in nodeToChildren) {
-    console.log("uid has children:", uid);
-    nodeToChildren[uid].forEach((node: ArgoNode) => {
-      console.log("child node is", node);
+  for(const uid in ownership) {
+    console.log("node is", uidToNode[uid]);
+    ownership[uid].forEach((childUID : string) => {
+      console.log("child is", uidToNode[childUID]);
     });
   }
 }
