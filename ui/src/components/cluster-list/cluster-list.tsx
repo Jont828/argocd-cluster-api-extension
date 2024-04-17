@@ -1,6 +1,12 @@
 import * as React from "react";
 // import Tree from "./components/Tree";
-import { Flex, Card } from "antd";
+import {
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  QuestionCircleOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
+import { Flex, Card, Tag } from "antd";
 
 require("./cluster-list.scss");
 
@@ -30,16 +36,20 @@ export default function ClusterList(props: any) {
         {props.clusterApps.map(clusterApp => {
           const { cluster, app } = clusterApp;
           const readyCondition = cluster.status.conditions.find((condition: any) => condition.type === "Ready");
+          const { Meta } = Card;
           return (
             <Card
-              title={(cluster.metadata.namespace == "default" ? "" : cluster.metadata.namespace + "/") + cluster.metadata.name}
               key={cluster.metadata.name}
               style={{ width: 300 }}
               hoverable
               onClick={() => { props.handleSelect(clusterApp) }}
             >
+              <Meta 
+                title={cluster.metadata.name}
+                description={cluster.metadata.namespace ? cluster.metadata.namespace : "default"}
+              />
               <p>App: {app.metadata.name}</p>
-              <p>Phase: {cluster.status.phase}</p>
+              { getPhaseTag(cluster.status.phase) }
               <p>Infra: {'infrastructureRef' in cluster.spec ? cluster.spec.infrastructureRef.kind : "Unknown"}</p>
               <p>Ready: {readyCondition ? readyCondition.status : "Unknown"}</p>
             </Card>
@@ -49,4 +59,36 @@ export default function ClusterList(props: any) {
       </Flex>
     </div>
   )
+}
+
+function getPhaseTag(phase : string) : any {
+  var color;
+  var icon;
+  switch (phase) {
+    case "Provisioned":
+      color = "success";
+      icon = <CheckCircleOutlined />;
+      break;
+    case "Provisioning":
+      color = "processing";
+      icon = <SyncOutlined spin />;
+      break;
+    case "Pending":
+    case "Deleting":
+      icon = <SyncOutlined spin />;
+      color = "warning";
+      break;
+    case "Failed":
+    case "Unknown":
+      color = "error";
+      icon = <ExclamationCircleOutlined />;
+      // icon = <CloseCircleOutlined />;
+      break;
+    default:
+      color = "default";
+      icon = <QuestionCircleOutlined />;
+      break;
+  }
+
+  return <Tag color={color}>{icon} {phase}</Tag>;
 }
