@@ -2,16 +2,22 @@ import * as React from "react";
 
 import { default as axios } from 'axios';
 
+import Tree from 'react-d3-tree';
+
 // import RawNodeDatum from 'react-d3-tree';
 
 export default function ClusterResources(props) {
   console.log("ClusterResources props are", props);
+
+  const [tree, setTree] = React.useState(null);
+  
   React.useEffect(() => {
     async function fetchData() {
       let result = await getResourceTree(props.app.metadata.name, props.app.metadata.namespace);
       console.log("result is", result);
       if ("nodes" in result) {
-        convertNodeListToD3ResourceTree(result.nodes);
+        let tree = convertNodeListToD3ResourceTree(result.nodes);
+        setTree(tree);
       } else {
         console.error("No nodes found in result", result);
       }
@@ -19,10 +25,16 @@ export default function ClusterResources(props) {
     fetchData();
   }, []);
 
+  if (tree == null) {
+    return <div>Nothing to show yet...</div>;
+  }
+  
   return (
     <div>
       <h1>Cluster Resources: {props.cluster.name}</h1>
-      <p>Coming soon...</p>
+      <div className="tree-wrapper">
+        <Tree data={tree} />
+      </div>
     </div>
   );
 }
@@ -69,9 +81,16 @@ interface OwnershipMap {
   [key: string]: Set<string>
 }
 
-function convertNodeListToD3ResourceTree(nodes: ArgoNode[]): any {
+interface TreeNode {
+  name: string,
+  children: TreeNode[]
+  attributes? : any
+}
+
+function convertNodeListToD3ResourceTree(nodes: ArgoNode[]): TreeNode {
   let ownership : OwnershipMap = {}; // Map of parent UID to set of children UIDs.
   let uidToNode = {}; // Map of UID to node.
+  let root = null;
   for (let node of nodes) {
     if (!(node.uid in uidToNode)) {
       uidToNode[node.uid] = node;
@@ -89,6 +108,9 @@ function convertNodeListToD3ResourceTree(nodes: ArgoNode[]): any {
       ownership[parentUID].add(node.uid);
     } else {
       console.log("Found root", node);
+      if (node.kind == "Cluster") {
+        root = node;
+      }
       ownership[node.uid] = new Set<string>();
     }
   }
@@ -99,4 +121,21 @@ function convertNodeListToD3ResourceTree(nodes: ArgoNode[]): any {
       console.log("child is", uidToNode[childUID]);
     });
   }
+
+  return convertArgoNodeToTreeNode(root, uidToNode, ownership);
+}
+
+function convertArgoNodeToTreeNode(node: ArgoNode, uidToNode : any, ownership : OwnershipMap): TreeNode {
+  let treeNode = {
+    name: node.name,
+    children: []
+  };
+
+  if (node.uid in ownership) {
+    ownership[node.uid].forEach((childUID : string) => {
+      treeNode.children.push(convertArgoNodeToTreeNode(uidToNode[childUID], uidToNode, ownership));
+    });
+  }
+
+  return treeNode;
 }
