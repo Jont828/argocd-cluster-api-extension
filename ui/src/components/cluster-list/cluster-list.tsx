@@ -6,12 +6,13 @@ import {
   QuestionCircleOutlined,
   SyncOutlined,
   CloseCircleOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
+  AppstoreFilled
 } from '@ant-design/icons';
 import { Flex, Card, Tag, Space } from "antd";
 
 import Icon from '@mdi/react';
-import { mdiApplicationBraces, mdiDocker } from '@mdi/js';
+import { mdiDocker } from '@mdi/js';
 
 require("./cluster-list.scss");
 
@@ -64,15 +65,19 @@ export default function ClusterList(props: any) {
                 title={<Flex justify="space-between" align="center">
                   <span>{cluster.metadata.name}</span>
                   <Icon path={mdiDocker} size={1} color="#1677FF" />
+                  {/* TODO: Import icons so it's not just MDI Docker */}
                 </Flex>}
                 description={cluster.metadata.namespace ? cluster.metadata.namespace : "default"}
               />
-              <Flex className="app-name-wrap" align="center">
+              {/* <Flex className="app-name-wrap" align="center">
                 <Icon path={mdiApplicationBraces} size="1em" />
                 <p style={{marginLeft: "4px"}}>{app.metadata.name}</p>
-              </Flex>
-
-              { getPhaseTag(cluster.status.phase) }
+              </Flex> */}
+              <Space size={[0, 4]} wrap className="app-name-wrap">
+                <Tag color="default"><AppstoreFilled /> {app.metadata.name}</Tag>
+                { getPhaseTag(cluster.status.phase) }
+              </Space>
+              
               <p>Conditions:</p>
               <Space size={[0, 4]} wrap>
                 {conditions.map((condition : Condition) => getConditionTag(condition) )}
