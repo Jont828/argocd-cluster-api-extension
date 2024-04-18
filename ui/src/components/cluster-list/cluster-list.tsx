@@ -9,7 +9,7 @@ import {
   InfoCircleOutlined,
   AppstoreFilled
 } from '@ant-design/icons';
-import { Flex, Card, Tag, Space } from "antd";
+import { Flex, Card, Tag, Space, Tooltip } from "antd";
 
 import Icon from '@mdi/react';
 import { mdiDocker } from '@mdi/js';
@@ -133,6 +133,7 @@ function getConditionTag(condition : Condition) : any {
   if (condition.status === "True") {
     color = "success";
     icon = <CheckCircleOutlined />;
+    return <Tag color={color}>{icon} {condition.type}</Tag>;
   } else {
     switch (condition.severity) {
       case "Info":
@@ -154,5 +155,13 @@ function getConditionTag(condition : Condition) : any {
     }
   }
 
-  return <Tag color={color}>{icon} {condition.type}</Tag>;
+  return (
+    <Tooltip
+      placement="bottom"
+      overlayClassName="tooltip-wrapper"
+      overlayInnerStyle={{lineHeight: "18px", padding: "4px 6px", minHeight: "28px"}}
+      title={<span className="tooltip-text">{condition.reason}</span>}>
+      <Tag color={color}>{icon} {condition.type}</Tag>
+    </Tooltip>
+  );
 }
