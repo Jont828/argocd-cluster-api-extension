@@ -5,10 +5,24 @@ import {
   ExclamationCircleOutlined,
   QuestionCircleOutlined,
   SyncOutlined,
+  CloseCircleOutlined,
+  InfoCircleOutlined
 } from '@ant-design/icons';
-import { Flex, Card, Tag } from "antd";
+import { Flex, Card, Tag, Space } from "antd";
+
+import Icon from '@mdi/react';
+import { mdiApplicationBraces, mdiDocker } from '@mdi/js';
 
 require("./cluster-list.scss");
+
+interface Condition {
+  type: string
+  status: string
+  lastTransitionTime?: string
+  message?: string
+  reason?: string
+  severity?: string
+}
 
 export default function ClusterList(props: any) {
   if (props.clusterApps.length === 0) {
@@ -35,7 +49,9 @@ export default function ClusterList(props: any) {
       <Flex gap="middle" align="flex-start" justify="flex-start" wrap="wrap">
         {props.clusterApps.map(clusterApp => {
           const { cluster, app } = clusterApp;
-          const readyCondition = cluster.status.conditions.find((condition: any) => condition.type === "Ready");
+          // const readyCondition = cluster.status.conditions.find((condition: any) => condition.type === "Ready");
+          let conditions = cluster.status.conditions;
+          console.log("Conditions are", conditions);
           const { Meta } = Card;
           return (
             <Card
@@ -45,13 +61,24 @@ export default function ClusterList(props: any) {
               onClick={() => { props.handleSelect(clusterApp) }}
             >
               <Meta 
-                title={cluster.metadata.name}
+                title={<Flex justify="space-between" align="center">
+                  <span>{cluster.metadata.name}</span>
+                  <Icon path={mdiDocker} size={1} color="#1677FF" />
+                </Flex>}
                 description={cluster.metadata.namespace ? cluster.metadata.namespace : "default"}
               />
-              <p>App: {app.metadata.name}</p>
+              <Flex className="app-name-wrap" align="center">
+                <Icon path={mdiApplicationBraces} size="1em" />
+                <p style={{marginLeft: "4px"}}>{app.metadata.name}</p>
+              </Flex>
+
               { getPhaseTag(cluster.status.phase) }
-              <p>Infra: {'infrastructureRef' in cluster.spec ? cluster.spec.infrastructureRef.kind : "Unknown"}</p>
-              <p>Ready: {readyCondition ? readyCondition.status : "Unknown"}</p>
+              <p>Conditions:</p>
+              <Space size={[0, 4]} wrap>
+                {conditions.map((condition : Condition) => getConditionTag(condition) )}
+              </Space>
+              {/* <p>Infra: {'infrastructureRef' in cluster.spec ? cluster.spec.infrastructureRef.kind : "Unknown"}</p>
+              <p>Ready: {readyCondition ? readyCondition.status : "Unknown"}</p> */}
             </Card>
           )
         })}
@@ -81,8 +108,8 @@ function getPhaseTag(phase : string) : any {
     case "Failed":
     case "Unknown":
       color = "error";
-      icon = <ExclamationCircleOutlined />;
-      // icon = <CloseCircleOutlined />;
+      // icon = <ExclamationCircleOutlined />;
+      icon = <CloseCircleOutlined />;
       break;
     default:
       color = "default";
@@ -91,4 +118,36 @@ function getPhaseTag(phase : string) : any {
   }
 
   return <Tag color={color}>{icon} {phase}</Tag>;
+}
+
+
+
+function getConditionTag(condition : Condition) : any {
+  var color;
+  var icon;
+  if (condition.status === "True") {
+    color = "success";
+    icon = <CheckCircleOutlined />;
+  } else {
+    switch (condition.severity) {
+      case "Info":
+        color = "processing";
+        icon = <InfoCircleOutlined />;
+        break;
+      case "Warning":
+        color = "warning";
+        icon = <ExclamationCircleOutlined />;
+        break;
+      case "Error":
+        color = "error";
+        icon = <CloseCircleOutlined />;
+        break;
+      default:
+        color = "default";
+        icon = <QuestionCircleOutlined />;
+        break;
+    }
+  }
+
+  return <Tag color={color}>{icon} {condition.type}</Tag>;
 }
