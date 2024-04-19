@@ -7,6 +7,7 @@ import {
   ArrowLeftOutlined
 } from '@ant-design/icons';
 import { Button, Typography } from "antd";
+import { TreeNode } from "antd/es/tree-select";
 
 // import RawNodeDatum from 'react-d3-tree';
 
@@ -38,6 +39,8 @@ export default function ClusterResources(props) {
     return <div>Nothing to show yet...</div>;
   }
   
+  const nodeSize = { x: 200, y: 200 };
+  const foreignObjectProps = { width: nodeSize.x, height: nodeSize.y, x: 20 };
   return (
     <div id="cluster-resources-wrap">
       <Button 
@@ -50,11 +53,51 @@ export default function ClusterResources(props) {
       />
       <Typography.Title>Cluster Resources: {props.cluster}</Typography.Title>
       <div className="tree-wrapper">
-        <Tree data={tree} />
+        <Tree 
+          data={tree} 
+          nodeSize={nodeSize}
+          renderCustomNodeElement={(rd3tProps) =>
+            renderForeignObjectNode({ ...rd3tProps, foreignObjectProps })
+          }
+        />
       </div>
     </div>
   );
 }
+
+const renderForeignObjectNode = ({
+  nodeDatum,
+  toggleNode,
+  foreignObjectProps
+}) => (
+  <g>
+    <circle r={15}></circle>
+    {/* `foreignObject` requires width & height to be explicitly set. */}
+    <foreignObject {...foreignObjectProps}>
+      <div style={{ border: "1px solid black", backgroundColor: "#dedede" }}>
+        <h3 style={{ textAlign: "center" }}>{nodeDatum.name}</h3>
+        {nodeDatum.children && (
+          <button style={{ width: "100%" }} onClick={toggleNode}>
+            {nodeDatum.__rd3t.collapsed ? "Expand" : "Collapse"}
+          </button>
+        )}
+      </div>
+    </foreignObject>
+  </g>
+);
+
+
+// function getResourceTreeNode({ nodeDatum, toggleNode }) : any {
+//   return (
+//     <g>
+//       <foreignObject>
+//       <Card title={nodeDatum.name} size="small" onClick={toggleNode}>
+//         <Typography.Paragraph>Lorem ipsum</Typography.Paragraph>
+//       </Card>
+//       </foreignObject>
+//     </g>
+//   )
+// }
 
 const getResourceTree = (appName: string, appNamespace: string | undefined): Promise<any> => {
   const params = {
