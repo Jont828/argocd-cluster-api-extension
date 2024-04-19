@@ -1,10 +1,17 @@
 import * as React from "react";
-
+import { useNavigate } from "react-router-dom";
 import { default as axios } from 'axios';
-
 import Tree from 'react-d3-tree';
 
+import {
+  ArrowLeftOutlined
+} from '@ant-design/icons';
+import { Button, Typography } from "antd";
+
 // import RawNodeDatum from 'react-d3-tree';
+
+require("./cluster-resources.scss");
+
 
 export default function ClusterResources(props) {
   console.log("ClusterResources props are", props);
@@ -25,13 +32,23 @@ export default function ClusterResources(props) {
     fetchData();
   }, []);
 
+  const navigate = useNavigate();
+
   if (tree == null) {
     return <div>Nothing to show yet...</div>;
   }
   
   return (
-    <div>
-      <h1>Cluster Resources: {props.cluster}</h1>
+    <div id="cluster-resources-wrap">
+      <Button 
+        type="primary"
+        shape="circle"
+        icon={<ArrowLeftOutlined />} 
+        onClick={() => {
+          navigate("/cluster-api");
+        }}
+      />
+      <Typography.Title>Cluster Resources: {props.cluster}</Typography.Title>
       <div className="tree-wrapper">
         <Tree data={tree} />
       </div>
