@@ -10,6 +10,10 @@ export const Extension = (props: any) => {
   const [clusterApps, setClusterApps] = React.useState([]); // [cluster1, cluster2, ...
   const [selected, setSelected] = React.useState(null);
 
+  const queryParameters = new URLSearchParams(window.location.search)
+  const cluster = queryParameters.get("cluster");
+  console.log("Query param is:", cluster);
+
   React.useEffect(() => {
     async function fetchData() {
       let result = await getClusterApps();

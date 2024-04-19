@@ -133,7 +133,7 @@ function getConditionTag(condition : Condition) : any {
   if (condition.status === "True") {
     color = "success";
     icon = <CheckCircleOutlined />;
-    return <Tag color={color}>{icon} {condition.type}</Tag>;
+    return <Tag key={condition.type} color={color}>{icon} {condition.type}</Tag>;
   } else {
     switch (condition.severity) {
       case "Info":
@@ -160,7 +160,9 @@ function getConditionTag(condition : Condition) : any {
       placement="bottom"
       overlayClassName="tooltip-wrapper"
       overlayInnerStyle={{lineHeight: "18px", padding: "4px 6px", minHeight: "28px"}}
-      title={<span className="tooltip-text">{condition.reason}</span>}>
+      title={<span className="tooltip-text">{condition.reason}</span>}
+      key={condition.type}
+    >
       <Tag color={color}>{icon} {condition.type}</Tag>
     </Tooltip>
   );
