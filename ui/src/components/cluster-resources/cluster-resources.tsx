@@ -13,7 +13,7 @@ export default function ClusterResources(props) {
   
   React.useEffect(() => {
     async function fetchData() {
-      let result = await getResourceTree(props.app.metadata.name, props.app.metadata.namespace);
+      let result = await getResourceTree(props.app, props.namespace);
       console.log("result is", result);
       if ("nodes" in result) {
         let tree = convertNodeListToD3ResourceTree(result.nodes);
@@ -31,7 +31,7 @@ export default function ClusterResources(props) {
   
   return (
     <div>
-      <h1>Cluster Resources: {props.cluster.name}</h1>
+      <h1>Cluster Resources: {props.cluster}</h1>
       <div className="tree-wrapper">
         <Tree data={tree} />
       </div>

@@ -2,38 +2,56 @@ import * as React from "react";
 // import Tree from "./components/Tree";
 import { default as axios } from 'axios';
 
+import { BrowserRouter } from 'react-router-dom';
+
 import ClusterResources from "./components/cluster-resources/cluster-resources";
 import ClusterList from "./components/cluster-list/cluster-list";
 
 export const Extension = (props: any) => {
   // const [apps, setApps] = React.useState(null);
   const [clusterApps, setClusterApps] = React.useState([]); // [cluster1, cluster2, ...
-  const [selected, setSelected] = React.useState(null);
+  // const [selected, setSelected] = React.useState(null);
 
   const queryParameters = new URLSearchParams(window.location.search)
-  const cluster = queryParameters.get("cluster");
-  console.log("Query param is:", cluster);
+  console.log("Query params are:", queryParameters);
+  const clusterName = queryParameters.get("cluster");
+  const appName = queryParameters.get("app");
+  const appNamespace = queryParameters.get("namespace");
 
   React.useEffect(() => {
-    async function fetchData() {
-      let result = await getClusterApps();
-      setClusterApps(result);
-    }
-    fetchData();
-  }, []);
+    // logic to run when id value updates
+  }, [clusterName, appName, appNamespace]);
+  // TODO: can we assume cluster namespace is the same as app namespace?
 
-  if (clusterApps.length === 0) {
-    return <div>No Clusters found</div>;
-  }
-
-  return (
-    <div id="root">
-      <ClusterList clusterApps={clusterApps} handleSelect={(clusterApp: ClusterApp) => setSelected(clusterApp)} />
-      {
-        selected && <ClusterResources app={selected.app} cluster={selected.cluster} />
+  if (appName) {
+    return (
+      <div id="root">
+        <BrowserRouter>
+          <ClusterResources cluster={clusterName} app={appName} namespace={appNamespace} />
+        </BrowserRouter>
+      </div>
+    )
+  } else {
+    React.useEffect(() => {
+      async function fetchData() {
+        let result = await getClusterApps();
+        setClusterApps(result);
       }
-    </div>
-  )
+      fetchData();
+    }, []);
+  
+    if (clusterApps.length === 0) {
+      return <div>No Clusters found</div>;
+    }
+  
+    return (
+      <div id="root">
+        <BrowserRouter>
+          <ClusterList clusterApps={clusterApps} />
+        </BrowserRouter>
+      </div>
+    )
+  }
 }
 
 export const component = Extension;

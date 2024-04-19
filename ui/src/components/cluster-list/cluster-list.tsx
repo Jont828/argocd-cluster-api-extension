@@ -1,4 +1,5 @@
 import * as React from "react";
+import { createSearchParams, useNavigate } from "react-router-dom";
 // import Tree from "./components/Tree";
 import {
   CheckCircleOutlined,
@@ -45,6 +46,8 @@ export default function ClusterList(props: any) {
     </Card>);
   }
 
+  const navigate = useNavigate();
+
   return (
     <div id="cluster-list-wrap">
       <Flex gap="middle" align="flex-start" justify="flex-start" wrap="wrap">
@@ -59,7 +62,16 @@ export default function ClusterList(props: any) {
               key={cluster.metadata.name}
               style={{ width: 300 }}
               hoverable
-              onClick={() => { props.handleSelect(clusterApp) }}
+              onClick={() => {
+                navigate({
+                  pathname: "/cluster-api",
+                  search: createSearchParams({
+                    cluster: cluster.metadata.name,
+                    app: app.metadata.name,
+                    namespace: app.metadata.namespace ? app.metadata.namespace : "default",
+                  }).toString()
+                });
+              }}
             >
               <Meta 
                 title={<Flex justify="space-between" align="center">
