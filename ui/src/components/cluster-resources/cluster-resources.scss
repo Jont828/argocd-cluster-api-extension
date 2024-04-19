@@ -4,7 +4,20 @@
 
 .tree-wrapper {
   // TODO: change this so it's not hard coded.
-  width: 1000px;
+  width: 1500px;
   height: 1000px;
   border: 1px solid black;
+}
+
+.tree-node {
+  width: 170px;
+  height: 50px;
+  text-align: center;
+  padding: 0;
+
+  .tree-node-text {
+    padding: 0;
+    margin: 2px 0;
+    font-size: 12px;
+  }
 }
