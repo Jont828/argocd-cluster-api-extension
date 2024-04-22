@@ -1,4 +1,4 @@
-.badge .topRight {
+.badge-wrap .top-right {
   position: absolute;
   display: inline-block;
 }
@@ -12,4 +12,9 @@
 
 .badge-fill {
   border-radius: 50%;
+}
+
+.badge-icon path {
+  color: #fff !important;
+  fill: #fff !important;
 }

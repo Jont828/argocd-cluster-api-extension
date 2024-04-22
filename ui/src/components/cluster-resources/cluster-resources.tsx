@@ -12,10 +12,13 @@ import { TreeNode } from "antd/es/tree-select";
 
 import { GetResource } from "../../util/index";
 
+import Badge from "../badge/badge";
+
 // import RawNodeDatum from 'react-d3-tree';
 
 require("./cluster-resources.scss");
 
+const badgeSize = 20;
 
 export default function ClusterResources(props) {
   console.log("ClusterResources props are", props);
@@ -45,8 +48,14 @@ export default function ClusterResources(props) {
     return <div>Nothing to show yet...</div>;
   }
   
-  const nodeSize = { x: 180, y: 200 };
-  const foreignObjectProps = { width: nodeSize.x, height: nodeSize.y, x: -nodeSize.x/2, y: -50/2};
+  const objSize = { x: 170, y: 50 };
+  const nodeSize = { x: objSize.x + badgeSize/2, y: 200 };
+  const foreignObjectProps = {
+    width: objSize.x + badgeSize/2, 
+    height: objSize.y + badgeSize/2, 
+    x: -objSize.x/2,
+    y: -objSize.y/2 - badgeSize/2
+  };
   // Note: y position is computed from the css size of the card, not the node height.
   return (
     <div id="cluster-resources-wrap">
@@ -87,25 +96,32 @@ const renderForeignObjectNode = ({
   nodeDatum,
   toggleNode,
   foreignObjectProps
-}) => (
-  <g>
-    {/* `foreignObject` requires width & height to be explicitly set. */}
-    <foreignObject {...foreignObjectProps}>
-      <Card
-        size="small"
-        className="tree-node"
-        onClick={toggleNode}
-        styles={{ body: { padding: "2px 0", borderRadius: "8px", backgroundColor: providerColorMap[nodeDatum.attributes.provider]}}}
-      >
-        <Flex align="center" vertical>
-          <Typography.Paragraph className="tree-node-text" strong>{nodeDatum.attributes?.kind}</Typography.Paragraph>
-          <Typography.Paragraph className="tree-node-text" italic>{nodeDatum.name}</Typography.Paragraph>
-        </Flex>
-      </Card>
-      {/* <Badge size={"12px"} ready={nodeDatum.ready} /> */}
-    </foreignObject>
-  </g>
-);
+}) => {
+
+  return (
+    <g>
+      {/* `foreignObject` requires width & height to be explicitly set. */}
+      <foreignObject {...foreignObjectProps}>
+        <div style={{marginTop: badgeSize/2 + "px"}}>
+          <Card
+            size="small"
+            className="tree-node"
+            onClick={toggleNode}
+            styles={{ body: { padding: "2px 0", borderRadius: "8px", backgroundColor: providerColorMap[nodeDatum.attributes.provider] } }}
+          >
+            <div className="card-inner">
+              <Flex align="center" vertical>
+                <Typography.Paragraph className="tree-node-text" strong>{nodeDatum.attributes?.kind}</Typography.Paragraph>
+                <Typography.Paragraph className="tree-node-text" italic>{nodeDatum.name}</Typography.Paragraph>
+              </Flex>
+              <Badge size={badgeSize} ready={true} />
+            </div>
+          </Card>
+        </div>
+      </foreignObject>
+    </g>
+  );
+}
 
 const getResourceTree = (appName: string, appNamespace: string | undefined): Promise<any> => {
   const params = {
