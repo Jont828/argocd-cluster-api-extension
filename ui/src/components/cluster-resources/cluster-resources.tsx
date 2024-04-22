@@ -78,10 +78,11 @@ export default function ClusterResources(props) {
           navigate("/cluster-api");
         }}
       />
-      <Typography.Title>Cluster Resources: {props.cluster}</Typography.Title>
+      {/* <Typography.Title>Cluster Resources: {props.cluster}</Typography.Title> */}
       <div className="tree-wrapper" ref={containerRef}>
         <Tree 
           collapsible={false}
+          zoomable={false}
           orientation="vertical"
           data={tree} 
           nodeSize={nodeSize}
@@ -293,8 +294,8 @@ export const useCenteredTree = () => {
   const [translate, setTranslate] = React.useState({ x: 0, y: 0 });
   const containerRef = React.useCallback((containerElem) => {
     if (containerElem !== null) {
-      const { width, height } = containerElem.getBoundingClientRect();
-      setTranslate({ x: width / 2, y: height / 2 });
+      const dim =  containerElem.getBoundingClientRect();
+      setTranslate({ x: dim.width / 2, y: 50 });
     }
   }, []);
   return {translate, containerRef};

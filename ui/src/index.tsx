@@ -6,13 +6,15 @@ import { BrowserRouter, useSearchParams } from 'react-router-dom';
 import ClusterResources from "./components/cluster-resources/cluster-resources";
 import ClusterList from "./components/cluster-list/cluster-list";
 
+require("./index.scss");
+
 export const Extension = (props: any) => {
   return (
-    <div id="root">
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </div>
+    // <div id="root">
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+    // </div>
   )
 }
 
