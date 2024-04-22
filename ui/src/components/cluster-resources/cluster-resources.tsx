@@ -14,8 +14,6 @@ import { GetResource } from "../../util/index";
 
 import Badge from "../badge/badge";
 
-// import RawNodeDatum from 'react-d3-tree';
-
 require("./cluster-resources.scss");
 
 const badgeSize = 20;
@@ -121,10 +119,10 @@ const renderForeignObjectNode = ({
             bordered={false}
             className="tree-node"
             onClick={toggleNode}
-            styles={{ body: { padding: "2px 0", borderRadius: "8px", backgroundColor: providerColorMap[nodeDatum.attributes.provider] } }}
+            styles={{ body: { height: "100%", padding: 0, borderRadius: "8px", backgroundColor: providerColorMap[nodeDatum.attributes.provider] } }}
           >
             <div className="card-inner">
-              <Flex align="center" vertical>
+              <Flex align="center" justify="center" vertical className="card-inner-flex">
                 <Typography.Paragraph className="tree-node-text" strong>{nodeDatum.attributes?.kind}</Typography.Paragraph>
                 <Typography.Paragraph className="tree-node-text" italic>{nodeDatum.name}</Typography.Paragraph>
               </Flex>

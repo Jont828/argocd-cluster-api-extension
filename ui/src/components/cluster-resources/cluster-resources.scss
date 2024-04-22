@@ -33,4 +33,9 @@
 
 .card-inner {
   position: relative;
+  height: 100%;
+  
+  .card-inner-flex {
+    height: 100%;
+  }
 }
