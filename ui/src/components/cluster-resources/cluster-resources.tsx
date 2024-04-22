@@ -30,8 +30,16 @@ export default function ClusterResources(props) {
       let result = await getResourceTree(props.app, props.namespace);
       console.log("result is", result);
       if ("nodes" in result) {
+        let nodeMap = new Map<string, any>();
+        for (let node of result.nodes) {
+          if (!nodeMap.has(node.uid)) {
+            nodeMap.set(node.uid, node);
+          }
+        }
+        let uniqueNodes = Array.from(nodeMap.values());
+        
         // TODO: filter duplicates from result.nodes first.
-        let nodes = await fetchResourcesForNodes(props.app, props.namespace, result.nodes);
+        let nodes = await fetchResourcesForNodes(props.app, props.namespace, uniqueNodes);
         // TODO: check error
         let tree = convertNodeListToD3ResourceTree(nodes);
         setTree(tree);
@@ -43,10 +51,7 @@ export default function ClusterResources(props) {
   }, []);
 
   const navigate = useNavigate();
-
-  if (tree == null) {
-    return <div>Nothing to show yet...</div>;
-  }
+  const { translate, containerRef } = useCenteredTree();
   
   const objSize = { x: 170, y: 50 };
   const nodeSize = { x: objSize.x + badgeSize/2, y: 200 };
@@ -57,6 +62,12 @@ export default function ClusterResources(props) {
     y: -objSize.y/2
   };
   // Note: y position is computed from the css size of the card, not the node height.
+
+
+  if (tree == null) {
+    return <div>Nothing to show yet...</div>;
+  }
+  
   return (
     <div id="cluster-resources-wrap">
       <Button 
@@ -68,12 +79,13 @@ export default function ClusterResources(props) {
         }}
       />
       <Typography.Title>Cluster Resources: {props.cluster}</Typography.Title>
-      <div className="tree-wrapper">
+      <div className="tree-wrapper" ref={containerRef}>
         <Tree 
           collapsible={false}
           orientation="vertical"
           data={tree} 
           nodeSize={nodeSize}
+          translate={translate}
           renderCustomNodeElement={(rd3tProps) =>
             renderForeignObjectNode({ ...rd3tProps, foreignObjectProps })
           }
@@ -275,3 +287,14 @@ function getProvider(group: string): string {
 
   return group.substring(0, providerIndex);
 }
+
+export const useCenteredTree = () => {
+  const [translate, setTranslate] = React.useState({ x: 0, y: 0 });
+  const containerRef = React.useCallback((containerElem) => {
+    if (containerElem !== null) {
+      const { width, height } = containerElem.getBoundingClientRect();
+      setTranslate({ x: width / 2, y: height / 2 });
+    }
+  }, []);
+  return {translate, containerRef};
+};
