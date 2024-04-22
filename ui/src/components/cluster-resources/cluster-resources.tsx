@@ -27,8 +27,10 @@ export default function ClusterResources(props) {
       let result = await getResourceTree(props.app, props.namespace);
       console.log("result is", result);
       if ("nodes" in result) {
-        let tree = await convertNodeListToD3ResourceTree(result.nodes);
-        console.log("Tree is", tree);
+        // TODO: filter duplicates from result.nodes first.
+        let nodes = await fetchResourcesForNodes(props.app, props.namespace, result.nodes);
+        // TODO: check error
+        let tree = convertNodeListToD3ResourceTree(nodes);
         setTree(tree);
       } else {
         console.error("No nodes found in result", result);
@@ -133,6 +135,12 @@ interface ArgoNode {
   parentRefs?: ArgoParentRef[]
 }
 
+interface ConditionNode extends ArgoNode {
+  hasReady: boolean
+  ready?: boolean
+  severity?: string
+}
+
 interface ArgoParentRef {
   group: string,
   kind: string,
@@ -153,7 +161,28 @@ interface TreeNode {
   attributes? : any
 }
 
-async function convertNodeListToD3ResourceTree(nodes: ArgoNode[]): Promise<TreeNode> {
+async function fetchResourcesForNodes(appName : string, appNamespace : string, nodes: ArgoNode[]): Promise<ConditionNode[]> {
+  let conditionNodes = [];
+  for (let node of nodes) {
+    let result = await GetResource(appName, appNamespace, node);
+    console.log("getResource() result is", result);
+    // TODO: catch error
+    // TODO: search for status.ready and status.severity in non-CAPI resoruces.
+    const readyCondition = result.status?.conditions?.find((condition: any) => condition.type === "Ready");
+    const conditionNode = {
+      ...node,
+      hasReady: readyCondition ? true : false,
+      ready: readyCondition ? readyCondition.status : "Unknown",
+      severity: readyCondition ? readyCondition.severity : "Unknown"
+    };
+
+    conditionNodes.push(conditionNode);
+  }
+
+  return conditionNodes;
+}
+
+function convertNodeListToD3ResourceTree(nodes: ConditionNode[]): TreeNode {
   let ownership : OwnershipMap = {}; // Map of parent UID to set of children UIDs.
   let uidToNode = {}; // Map of UID to node.
   let root = null;
@@ -191,11 +220,8 @@ async function convertNodeListToD3ResourceTree(nodes: ArgoNode[]): Promise<TreeN
   return convertArgoNodeToTreeNode(root, uidToNode, ownership);
 }
 
-async function convertArgoNodeToTreeNode(node: ArgoNode, uidToNode : any, ownership : OwnershipMap): Promise<TreeNode> {
+function convertArgoNodeToTreeNode(node: ConditionNode, uidToNode : any, ownership : OwnershipMap): TreeNode {
   console.log("ArgoNode is", node);
-  let resource = await GetResource(node.name, node.namespace, node);
-  console.log("Got resource:", resource);
-  const readyCondition = resource.status.conditions?.find((condition: any) => condition.type === "Ready");
   let treeNode = {
     name: node.name,
     attributes: {
@@ -205,9 +231,9 @@ async function convertArgoNodeToTreeNode(node: ArgoNode, uidToNode : any, owners
       uid: node.uid,
       version: node.version,
       provider: getProvider(node.group),
-      hasReady: readyCondition ? true : false,
-      ready: readyCondition ? readyCondition.status : "Unknown",
-      severity: readyCondition ? readyCondition.severity : null,
+      hasReady: node.hasReady,
+      ready: node.ready,
+      severity: node.severity,
     },
     children: []
   };
