@@ -7,6 +7,7 @@ import {
   ArrowLeftOutlined
 } from '@ant-design/icons';
 import { Button, Typography, Card, Flex } from "antd";
+import { blue, gold, green, purple, red, gray } from '@ant-design/colors';
 import { TreeNode } from "antd/es/tree-select";
 
 // import RawNodeDatum from 'react-d3-tree';
@@ -39,7 +40,7 @@ export default function ClusterResources(props) {
     return <div>Nothing to show yet...</div>;
   }
   
-  const nodeSize = { x: 170, y: 200 };
+  const nodeSize = { x: 180, y: 200 };
   const foreignObjectProps = { width: nodeSize.x, height: nodeSize.y, x: -nodeSize.x/2, y: -50/2};
   // Note: y position is computed from the css size of the card, not the node height.
   return (
@@ -67,6 +68,15 @@ export default function ClusterResources(props) {
   );
 }
 
+const providerColorMap = {
+  cluster: blue[5],
+  bootstrap: gold[4],
+  controlplane: purple[4],
+  infrastructure: green[4],
+  addons: red[5],
+  virtual: gray[5],
+}
+
 const renderForeignObjectNode = ({
   nodeDatum,
   toggleNode,
@@ -79,7 +89,7 @@ const renderForeignObjectNode = ({
         size="small"
         className="tree-node"
         onClick={toggleNode}
-        styles={{ body: { padding: "0.8px 0 0 0" }}}
+        styles={{ body: { padding: "2px 0", borderRadius: "8px", backgroundColor: providerColorMap[nodeDatum.attributes.provider]}}}
       >
         <Flex align="center" vertical>
           <Typography.Paragraph className="tree-node-text" strong>{nodeDatum.attributes?.kind}</Typography.Paragraph>
@@ -177,6 +187,7 @@ function convertNodeListToD3ResourceTree(nodes: ArgoNode[]): TreeNode {
 }
 
 function convertArgoNodeToTreeNode(node: ArgoNode, uidToNode : any, ownership : OwnershipMap): TreeNode {
+  console.log("ArgoNode is", node);
   let treeNode = {
     name: node.name,
     attributes: {
@@ -200,7 +211,7 @@ function convertArgoNodeToTreeNode(node: ArgoNode, uidToNode : any, ownership : 
 }
 
 function getProvider(group: string): string {
-  if (!group.includes("cluster.x-k8s.io")) {
+  if (!group || !(group.includes("cluster.x-k8s.io"))) {
       return "virtual";
   }
 
