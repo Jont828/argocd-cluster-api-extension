@@ -44,10 +44,7 @@ export default function Badge(props : any) {
               width: (props.size - 4) + "px",
             }}
           >
-            <Flex justify="center" align="center" style={{
-              height: (props.size - 4) + "px",
-              width: (props.size - 4) + "px",
-            }}>
+            <Flex justify="center" align="center" className="badge-icon-wrap">
               <Icon path={path} size={"12px"} color="#fff" className="badge-icon" />
             </Flex>
           </div>
