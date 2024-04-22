@@ -3,12 +3,12 @@ import * as React from "react";
 import { blue, gold, green, red, gray } from '@ant-design/colors';
 import { mdiCheck, mdiSync, mdiExclamation } from "@mdi/js";
 import Icon from "@mdi/react";
+import { Flex } from "antd";
 
 require("./badge.scss");
 
 export default function Badge(props : any) {
-  const bg ="#000";
-  // const bg ="#DEE6EB";
+  const bg ="#DEE6EB";
   var path;
   if (props.ready) {
     path = mdiCheck;
@@ -44,7 +44,12 @@ export default function Badge(props : any) {
               width: (props.size - 4) + "px",
             }}
           >
-            <Icon path={path} size={"12px"} color="#fff" className="badge-icon" />
+            <Flex justify="center" align="center" style={{
+              height: (props.size - 4) + "px",
+              width: (props.size - 4) + "px",
+            }}>
+              <Icon path={path} size={"12px"} color="#fff" className="badge-icon" />
+            </Flex>
           </div>
         </div>
       </div>

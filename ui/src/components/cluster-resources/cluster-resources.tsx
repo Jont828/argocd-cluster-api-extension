@@ -54,7 +54,7 @@ export default function ClusterResources(props) {
     width: objSize.x + badgeSize/2, 
     height: objSize.y + badgeSize/2, 
     x: -objSize.x/2,
-    y: -objSize.y/2 - badgeSize/2
+    y: -objSize.y/2
   };
   // Note: y position is computed from the css size of the card, not the node height.
   return (
