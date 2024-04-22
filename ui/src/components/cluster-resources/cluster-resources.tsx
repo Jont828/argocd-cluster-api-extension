@@ -117,6 +117,7 @@ const renderForeignObjectNode = ({
         <div style={{marginTop: badgeSize/2 + "px"}}>
           <Card
             size="small"
+            bordered={false}
             className="tree-node"
             onClick={toggleNode}
             styles={{ body: { padding: "2px 0", borderRadius: "8px", backgroundColor: providerColorMap[nodeDatum.attributes.provider] } }}
