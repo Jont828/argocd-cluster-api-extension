@@ -1,0 +1,15 @@
+.badge .topRight {
+  position: absolute;
+  display: inline-block;
+}
+
+.border {
+  position: relative;
+  border-radius: 50%;
+  border-width: 2px !important;
+  border-style: solid !important;
+}
+
+.badge-fill {
+  border-radius: 50%;
+}

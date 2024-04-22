@@ -18,6 +18,8 @@ import { Flex, Card, Tag, Space, Tooltip } from "antd";
 import Icon from '@mdi/react';
 import { mdiDocker } from '@mdi/js';
 
+import { GetResource } from "../../util/index";
+
 require("./cluster-list.scss");
 
 interface Condition {
@@ -114,24 +116,6 @@ export default function ClusterList(props: any) {
   )
 }
 
-// @ts-ignore
-const getResource = (appName: string, appNamespace: string | undefined, resource: any): Promise<any> => {
-  const params = {
-    name: appName,
-    appNamespace,
-    namespace: resource.namespace,
-    resourceName: resource.name,
-    version: resource.version,
-    kind: resource.kind,
-    group: resource.group || ''
-  };
-
-  return axios.get(`/api/v1/applications/${appName}/resource`, { params }).then(response => {
-    const { manifest } = response.data;
-    return JSON.parse(manifest);
-  });
-};
-
 interface ClusterApp {
   cluster: any;
   app: any;
@@ -144,9 +128,9 @@ async function getClusterApps(): Promise<ClusterApp[]> {
   for (const app of apps) {
     if ("resources" in app.status) {
       let resources = app.status.resources;
-      const found = resources.find((resource: any) => resource.kind === "Cluster" && resource.group === "cluster.x-k8s.io");
-      if (found) {
-        let result = await getResource(app.metadata.name, app.metadata.namespace, found);
+      const cluster = resources.find((resource: any) => resource.kind === "Cluster" && resource.group === "cluster.x-k8s.io");
+      if (cluster) {
+        let result = await GetResource(app.metadata.name, app.metadata.namespace, cluster);
         console.log("getResource() result is", result);
         clusterApps.push({
           cluster: result,

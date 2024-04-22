@@ -10,6 +10,8 @@ import { Button, Typography, Card, Flex } from "antd";
 import { blue, gold, green, purple, red, gray } from '@ant-design/colors';
 import { TreeNode } from "antd/es/tree-select";
 
+import { GetResource } from "../../util/index";
+
 // import RawNodeDatum from 'react-d3-tree';
 
 require("./cluster-resources.scss");
@@ -25,7 +27,8 @@ export default function ClusterResources(props) {
       let result = await getResourceTree(props.app, props.namespace);
       console.log("result is", result);
       if ("nodes" in result) {
-        let tree = convertNodeListToD3ResourceTree(result.nodes);
+        let tree = await convertNodeListToD3ResourceTree(result.nodes);
+        console.log("Tree is", tree);
         setTree(tree);
       } else {
         console.error("No nodes found in result", result);
@@ -56,6 +59,7 @@ export default function ClusterResources(props) {
       <Typography.Title>Cluster Resources: {props.cluster}</Typography.Title>
       <div className="tree-wrapper">
         <Tree 
+          collapsible={false}
           orientation="vertical"
           data={tree} 
           nodeSize={nodeSize}
@@ -96,6 +100,7 @@ const renderForeignObjectNode = ({
           <Typography.Paragraph className="tree-node-text" italic>{nodeDatum.name}</Typography.Paragraph>
         </Flex>
       </Card>
+      {/* <Badge size={"12px"} ready={nodeDatum.ready} /> */}
     </foreignObject>
   </g>
 );
@@ -148,7 +153,7 @@ interface TreeNode {
   attributes? : any
 }
 
-function convertNodeListToD3ResourceTree(nodes: ArgoNode[]): TreeNode {
+async function convertNodeListToD3ResourceTree(nodes: ArgoNode[]): Promise<TreeNode> {
   let ownership : OwnershipMap = {}; // Map of parent UID to set of children UIDs.
   let uidToNode = {}; // Map of UID to node.
   let root = null;
@@ -186,8 +191,11 @@ function convertNodeListToD3ResourceTree(nodes: ArgoNode[]): TreeNode {
   return convertArgoNodeToTreeNode(root, uidToNode, ownership);
 }
 
-function convertArgoNodeToTreeNode(node: ArgoNode, uidToNode : any, ownership : OwnershipMap): TreeNode {
+async function convertArgoNodeToTreeNode(node: ArgoNode, uidToNode : any, ownership : OwnershipMap): Promise<TreeNode> {
   console.log("ArgoNode is", node);
+  let resource = await GetResource(node.name, node.namespace, node);
+  console.log("Got resource:", resource);
+  const readyCondition = resource.status.conditions?.find((condition: any) => condition.type === "Ready");
   let treeNode = {
     name: node.name,
     attributes: {
@@ -196,7 +204,10 @@ function convertArgoNodeToTreeNode(node: ArgoNode, uidToNode : any, ownership : 
       namespace: node.namespace,
       uid: node.uid,
       version: node.version,
-      provider: getProvider(node.group)
+      provider: getProvider(node.group),
+      hasReady: readyCondition ? true : false,
+      ready: readyCondition ? readyCondition.status : "Unknown",
+      severity: readyCondition ? readyCondition.severity : null,
     },
     children: []
   };
