@@ -68,27 +68,34 @@ export default function ClusterResources(props) {
   
   return (
     <div id="cluster-resources-wrap">
-      <Button 
-        type="primary"
-        shape="circle"
-        icon={<ArrowLeftOutlined />} 
-        onClick={() => {
-          navigate("/cluster-api");
-        }}
-      />
-      {/* <Typography.Title>Cluster Resources: {props.cluster}</Typography.Title> */}
-      <div className="tree-wrapper" ref={containerRef}>
-        <Tree 
-          collapsible={false}
-          zoomable={false}
-          orientation="vertical"
-          data={tree} 
-          nodeSize={nodeSize}
-          translate={translate}
-          renderCustomNodeElement={(rd3tProps) =>
-            renderForeignObjectNode({ ...rd3tProps, foreignObjectProps })
-          }
-        />
+      <div id="relative-wrap">
+        <div id="header">
+          <Flex align="center">
+            <Button
+              className="back-button"
+              type="primary"
+              shape="circle"
+              icon={<ArrowLeftOutlined />} 
+              onClick={() => {
+                navigate("/cluster-api");
+              }}
+            />
+            <Typography.Title className="header-title">Cluster Resources: {props.cluster}</Typography.Title>
+          </Flex>
+        </div>
+        <div className="tree-wrapper" ref={containerRef}>
+          <Tree 
+            collapsible={false}
+            zoomable={false}
+            orientation="vertical"
+            data={tree} 
+            nodeSize={nodeSize}
+            translate={translate}
+            renderCustomNodeElement={(rd3tProps) =>
+              renderForeignObjectNode({ ...rd3tProps, foreignObjectProps })
+            }
+          />
+        </div>
       </div>
     </div>
   );
@@ -293,7 +300,7 @@ export const useCenteredTree = () => {
   const containerRef = React.useCallback((containerElem) => {
     if (containerElem !== null) {
       const dim =  containerElem.getBoundingClientRect();
-      setTranslate({ x: dim.width / 2, y: 50 });
+      setTranslate({ x: dim.width / 2, y: 100 });
     }
   }, []);
   return {translate, containerRef};

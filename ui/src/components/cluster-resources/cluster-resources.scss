@@ -1,20 +1,40 @@
 #cluster-resources-wrap {
-  margin-top: 10px;
   width: 100%;
   height: 100%;
-  // min-height: inherit;
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
+
+  #relative-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    #header {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+
+      .back-button {
+        display: inline-block;
+      }
+
+      .header-title {
+        display: inline-block;
+        margin-bottom: 0;
+        margin-left: 10px;
+      }
+    }
+  }
 }
 
 .tree-wrapper {
   // TODO: change this so it's not hard coded.
   width: 100%;
   height: 100%;
-  border: 1px solid black;
+  // border: 1px solid black;
 }
 
 .tree-node {
