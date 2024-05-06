@@ -8,7 +8,6 @@ import { Flex } from "antd";
 require("./badge.scss");
 
 export default function Badge(props : any) {
-  console.log("Badge props are", props);
   
   const bg ="#DEE6EB";
   var path;

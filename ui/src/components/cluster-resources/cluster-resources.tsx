@@ -115,7 +115,6 @@ const renderForeignObjectNode = ({
   toggleNode,
   foreignObjectProps
 }) => {
-  console.log("Node datum is", nodeDatum);
   return (
     <g>
       {/* `foreignObject` requires width & height to be explicitly set. */}
@@ -224,23 +223,35 @@ async function fetchResourcesForNodes(appName : string, appNamespace : string, n
 
 function convertNodeListToD3ResourceTree(nodes: ConditionNode[]): TreeNode {
   let ownership : OwnershipMap = {}; // Map of parent UID to set of children UIDs.
-  let uidToNode = {}; // Map of UID to node.
+  let uidToNode: [string: ArgoNode] = {} as [string: ArgoNode]; // Map of UID to node.
   let root = null;
   for (let node of nodes) {
     if (!(node.uid in uidToNode)) {
       uidToNode[node.uid] = node;
     }
+  }
 
+  for (let node of nodes) {
     if ("parentRefs" in node) {
-      // TODO: figure out transitive owners later on.
-      if (node.parentRefs.length > 1) {
-        console.error("Node has more than one parentRefs", node);
+      // // TODO: figure out transitive owners later on.
+      // if (node.parentRefs.length > 1) {
+      //   console.error("Node has more than one parentRefs", node);
+      // }
+      // const parentUID = node.parentRefs[0].uid;
+      // if (!(parentUID in ownership)) {
+      //   ownership[parentUID] =  new Set<string>();
+      // }
+      // ownership[parentUID].add(node.uid);
+
+      const parentUID = pickOwner(node, uidToNode);
+      if (parentUID) {
+        if (!(parentUID in ownership)) {
+          ownership[parentUID] =  new Set<string>();
+        }
+        ownership[parentUID].add(node.uid);
+      } else {
+        console.error("Node has no owner", node);
       }
-      const parentUID = node.parentRefs[0].uid;
-      if (!(parentUID in ownership)) {
-        ownership[parentUID] =  new Set<string>();
-      }
-      ownership[parentUID].add(node.uid);
     } else {
       console.log("Found root", node);
       if (node.kind == "Cluster") {
@@ -250,12 +261,12 @@ function convertNodeListToD3ResourceTree(nodes: ConditionNode[]): TreeNode {
     }
   }
 
-  for(const uid in ownership) {
-    console.log("node is", uidToNode[uid]);
-    ownership[uid].forEach((childUID : string) => {
-      console.log("child is", uidToNode[childUID]);
-    });
-  }
+  // for(const uid in ownership) {
+  //   console.log("node is", uidToNode[uid]);
+  //   ownership[uid].forEach((childUID : string) => {
+  //     console.log("child is", uidToNode[childUID]);
+  //   });
+  // }
 
   return convertArgoNodeToTreeNode(root, uidToNode, ownership);
 }
@@ -310,3 +321,86 @@ export const useCenteredTree = () => {
   }, []);
   return {translate, containerRef};
 };
+
+function pickOwner(node : ArgoNode, uidToNode : [string : ArgoNode]) : string {
+  let ownershipGraph = NewOwnershipGraph(node, uidToNode);
+  console.log("Ownership graph is", ownershipGraph);
+  
+  removeTransitiveOwners(node.uid, ownershipGraph);
+
+  const owners = ownershipGraph.ownerRefs.get(node.uid);
+  console.log("Node is", node);
+  console.log("Owners are", owners);
+  
+  if (!owners || owners.size == 0) {
+    return null;
+  } else if (owners.size == 1) {
+    return owners.values().next().value;
+  } else {
+    console.error("Node has more than one owner after reduction", node);
+    return owners.values().next().value;
+  }
+}
+
+interface OwnershipGraph {
+  // Objects is a map of objects indexed by their UID. They indicate nodes in the graph.
+  objects: [string : ArgoNode]
+
+  // OwnerRefs is a map of objects to a set of their ownerRefs. They indicate directed edges in the graph, such that an edge from
+  // node I to J means that I is owned by J.
+  // The set is implemented as a `map[types.UID]struct{}` (meaning a map with empty structs as values) for fast lookup.
+  ownerRefs: Map<string, Set<string>>
+}
+
+function NewOwnershipGraph(obj : ArgoNode, uidToNode: [string: ArgoNode]): OwnershipGraph {
+  let ownershipGraph: OwnershipGraph = {
+    objects: uidToNode,
+    ownerRefs: new Map<string, Set<string>>()
+  };
+
+  constructOwnershipGraph(obj, uidToNode, ownershipGraph);
+
+  return ownershipGraph;
+}
+
+function constructOwnershipGraph(obj : ArgoNode, uidToNode: [string: ArgoNode], ownershipGraph : OwnershipGraph): OwnershipGraph {
+  let parentRefs = obj.parentRefs; // TODO: check if refs exist.
+  if (parentRefs) {
+    parentRefs.forEach((parentRef) => {
+      if (!ownershipGraph.ownerRefs.has(obj.uid)) {
+        ownershipGraph.ownerRefs.set(obj.uid, new Set<string>());
+      }
+      let set = ownershipGraph.ownerRefs.get(obj.uid);
+      set.add(parentRef.uid);
+      ownershipGraph.ownerRefs.set(obj.uid, set);
+  
+      constructOwnershipGraph(uidToNode[parentRef.uid], uidToNode, ownershipGraph);
+    })
+  }
+
+  return ownershipGraph;
+}
+
+function removeTransitiveOwners(start : string, ownershipGraph : OwnershipGraph) {
+  removeTransitiveOwnersHelper(start, start, ownershipGraph);
+}
+
+function removeTransitiveOwnersHelper(start : string, current : string, ownershipGraph : OwnershipGraph) {
+  if (ownershipGraph.ownerRefs.get(current)) {
+    ownershipGraph.ownerRefs.get(current).forEach((ownerUID : string) => {
+      if (current != start) {
+        let set = ownershipGraph.ownerRefs.get(start);
+        console.log("Set is", set);
+        
+        set.delete(ownerUID);
+        console.log("Set after delete is", set);
+        ownershipGraph.ownerRefs.set(start, set);
+        console.log("OwnerRefs after delete is", ownershipGraph.ownerRefs.get(start));
+      }
+  
+      removeTransitiveOwnersHelper(start, ownerUID, ownershipGraph);
+     })
+  } else {
+    console.log("No owners for", current);
+  }
+}
