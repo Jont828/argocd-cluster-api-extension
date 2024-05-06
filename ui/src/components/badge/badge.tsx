@@ -64,9 +64,9 @@ function getColor(ready : boolean, severity : string) {
     case "Error":
       return red[5];
     case "Warning":
-      return gold[6];
+      return gold[5];
     case "Info":
-      return gold[6];
+      return gold[5];
       // return blue[6];
     default:
       return gray[6];
