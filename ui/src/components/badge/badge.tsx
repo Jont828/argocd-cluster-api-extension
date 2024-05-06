@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { blue, gold, green, red, gray } from '@ant-design/colors';
+import { gold, green, red, gray } from '@ant-design/colors';
 import { mdiCheck, mdiSync, mdiExclamation } from "@mdi/js";
 import Icon from "@mdi/react";
 import { Flex } from "antd";
@@ -8,11 +8,13 @@ import { Flex } from "antd";
 require("./badge.scss");
 
 export default function Badge(props : any) {
+  console.log("Badge props are", props);
+  
   const bg ="#DEE6EB";
   var path;
   if (props.ready) {
     path = mdiCheck;
-  } else if (props.severityType === "error") {
+  } else if (props.severity === "Error") {
     path = mdiExclamation;
   } else {
     path = mdiSync;
@@ -39,7 +41,7 @@ export default function Badge(props : any) {
         >
           <div className="badge-fill"
             style={{
-              backgroundColor: getColor(props.ready, props.severityType),
+              backgroundColor: getColor(props.ready, props.severity),
               height: (props.size - 4) + "px",
               width: (props.size - 4) + "px",
             }}
@@ -54,17 +56,18 @@ export default function Badge(props : any) {
   )
 }
 
-function getColor(ready : boolean, severityType : string) {
+function getColor(ready : boolean, severity : string) {
   if (ready) {
     return green[6];
   }
-  switch(severityType) {
-    case "error":
+  switch(severity) {
+    case "Error":
       return red[5];
-    case "warning":
+    case "Warning":
       return gold[6];
-    case "info":
-      return blue[6];
+    case "Info":
+      return gold[6];
+      // return blue[6];
     default:
       return gray[6];
   }

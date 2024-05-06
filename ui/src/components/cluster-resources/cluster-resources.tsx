@@ -115,7 +115,7 @@ const renderForeignObjectNode = ({
   toggleNode,
   foreignObjectProps
 }) => {
-
+  console.log("Node datum is", nodeDatum);
   return (
     <g>
       {/* `foreignObject` requires width & height to be explicitly set. */}
@@ -133,7 +133,11 @@ const renderForeignObjectNode = ({
                 <Typography.Paragraph className="tree-node-text" strong>{nodeDatum.attributes?.kind}</Typography.Paragraph>
                 <Typography.Paragraph className="tree-node-text" italic>{nodeDatum.name}</Typography.Paragraph>
               </Flex>
-              <Badge size={badgeSize} ready={true} />
+              {
+                nodeDatum.attributes?.hasReady ?
+                (<Badge size={badgeSize} ready={nodeDatum.attributes.ready} severity={nodeDatum.attributes.severity} />) : 
+                (<div></div>)
+              }
             </div>
           </Card>
         </div>
@@ -204,11 +208,12 @@ async function fetchResourcesForNodes(appName : string, appNamespace : string, n
     // TODO: catch error
     // TODO: search for status.ready and status.severity in non-CAPI resoruces.
     const readyCondition = result.status?.conditions?.find((condition: any) => condition.type === "Ready");
+    console.log("Got ready condition", readyCondition);
     const conditionNode = {
       ...node,
       hasReady: readyCondition ? true : false,
-      ready: readyCondition ? readyCondition.status : "Unknown",
-      severity: readyCondition ? readyCondition.severity : "Unknown"
+      ready: readyCondition ? readyCondition.status === "True" : null,
+      severity: readyCondition ? readyCondition.severity : null
     };
 
     conditionNodes.push(conditionNode);
